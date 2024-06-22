@@ -1,0 +1,32 @@
+library(ggplot2)
+library(vcd)
+library(grid)
+
+data <- data.frame(
+  Year = c(2019, 2020, 2022, 2023, 2024),
+  Job_Sector = c('IT', 'Government Job', 'Customer care', 'Bank', 'Games'),
+  Job_Seekers_Rate = c(95, 97, 98, 82, 74),
+  Selection_Rate = c(25, 12, 45, 20, 35)
+)
+
+pie_plot <- function(data) {
+  pie(data$Job_Seekers_Rate, labels = data$Job_Sector, main = "Job Seekers Rate by Job Sector", col = rainbow(length(data$Job_Sector)))
+}
+
+mosaic_plot <- function(data) {
+  data_mosaic <- table(data$Year, data$Job_Sector)
+  mosaic(data_mosaic, main = "Mosaic Plot of Job Sectors Over Years")
+}
+
+funnel_plot <- function(data) {
+  data_sorted <- data[order(data$Selection_Rate, decreasing = TRUE), ]
+  ggplot(data_sorted, aes(x = reorder(Job_Sector, Selection_Rate), y = Selection_Rate)) +
+    geom_bar(stat = "identity", fill = "skyblue") +
+    coord_flip() +
+    ggtitle("Funnel Plot of Selection Rates by Job Sector") +
+    xlab("Job Sector") + ylab("Selection Rate (%)")
+}
+
+pie_plot(data)
+mosaic_plot(data)
+print(funnel_plot(data))
