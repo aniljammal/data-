@@ -1,0 +1,29 @@
+survey_data <- data.frame(
+  Product = c('A', 'B', 'C', 'D', 'E'),
+  Price = c(50, 70, 60, 45, 55),
+  Rating = c(4.2, 3.8, 4.0, 4.5, 3.9),
+  Age_Group = c('25-35', '35-45', '18-25', '45-55', '25-35')
+)
+
+survey_data$Age_Group <- as.numeric(factor(survey_data$Age_Group, levels = c('18-25', '25-35', '35-45', '45-55')))
+
+fig <- plot_ly(survey_data, x = ~Price, y = ~Age_Group, z = ~Rating, type = 'scatter3d', mode = 'markers')
+fig <- fig %>% layout(title = '3D Scatter Plot of Consumer Survey Data',
+                      scene = list(xaxis = list(title = 'Price ($)'),
+                                   yaxis = list(title = 'Age Group'),
+                                   zaxis = list(title = 'Rating (out of 5)')))
+fig
+
+rating_surface <- loess(Rating ~ Price * Age_Group, data = survey_data)
+price_seq <- seq(min(survey_data$Price), max(survey_data$Price), length.out = 30)
+age_group_seq <- seq(min(survey_data$Age_Group), max(survey_data$Age_Group), length.out = 30)
+rating_grid <- expand.grid(Price = price_seq, Age_Group = age_group_seq)
+rating_grid$Rating <- predict(rating_surface, newdata = rating_grid)
+
+fig_surface <- plot_ly(z = ~matrix(rating_grid$Rating, nrow = 30), 
+                       x = ~price_seq, y = ~age_group_seq, type = 'surface')
+fig_surface <- fig_surface %>% layout(title = '3D Surface Plot of Product Ratings',
+                                      scene = list(xaxis = list(title = 'Price ($)'),
+                                                   yaxis = list(title = 'Age Group'),
+                                                   zaxis = list(title = 'Rating (out of 5)')))
+fig_surface
