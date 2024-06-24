@@ -1,0 +1,30 @@
+
+library(ggplot2)
+library(forecast) # For seasonal decomposition
+library(TTR) # For smoothed line
+
+
+data_timeseries <- data.frame(
+  Date = as.Date(c("2023-01-01", "2023-02-01", "2023-03-01", "2023-04-01", "2023-05-01")),
+  Sales = c(100, 120, 150, 130, 140)
+)
+
+ggplot(data_timeseries, aes(x=Date, y=Sales)) +
+  geom_line() +
+  ggtitle("Line Plot of Sales over Time")
+
+ggplot(data_timeseries, aes(x=format(Date, "%B"), y=Sales)) +
+  geom_bar(stat="identity") +
+  ggtitle("Monthly Average Sales")
+
+sales_ts <- ts(data_timeseries$Sales, start=c(2023, 1), frequency=12)
+decomposed <- decompose(sales_ts)
+plot(decomposed)
+
+gglagplot(sales_ts)
+
+data_timeseries$Sales_SMA <- SMA(data_timeseries$Sales, n=2)
+ggplot(data_timeseries, aes(x=Date, y=Sales)) +
+  geom_line() +
+  geom_line(aes(y=Sales_SMA), color="red") +
+  ggtitle("Time Series Plot with Smoothed Line of Sales")
