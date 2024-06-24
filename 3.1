@@ -1,0 +1,28 @@
+library(ggplot2)
+library(plotly)
+weather_data <- data.frame(
+  Date = as.Date(c('2023-01-01', '2023-01-02', '2023-01-03', '2023-01-04', '2023-01-05')),
+  Temperature = c(10, 12, 8, 15, 14),
+  Humidity = c(75, 70, 80, 65, 72),
+  Wind_Speed = c(15, 12, 18, 20, 16)
+)
+fig <- plot_ly(weather_data, x = ~Humidity, y = ~Wind_Speed, z = ~Temperature, type = 'scatter3d', mode = 'markers')
+fig <- fig %>% layout(title = '3D Scatter Plot of Weather Data',
+                      scene = list(xaxis = list(title = 'Humidity (%)'),
+                                   yaxis = list(title = 'Wind Speed (km/h)'),
+                                   zaxis = list(title = 'Temperature (°C)')))
+fig
+
+temperature_surface <- loess(Temperature ~ Humidity * Wind_Speed, data = weather_data)
+humidity_seq <- seq(min(weather_data$Humidity), max(weather_data$Humidity), length.out = 30)
+wind_speed_seq <- seq(min(weather_data$Wind_Speed), max(weather_data$Wind_Speed), length.out = 30)
+temperature_grid <- expand.grid(Humidity = humidity_seq, Wind_Speed = wind_speed_seq)
+temperature_grid$Temperature <- predict(temperature_surface, newdata = temperature_grid)
+
+fig_surface <- plot_ly(z = ~matrix(temperature_grid$Temperature, nrow = 30), 
+                       x = ~humidity_seq, y = ~wind_speed_seq, type = 'surface')
+fig_surface <- fig_surface %>% layout(title = '3D Surface Plot of Temperature',
+                                      scene = list(xaxis = list(title = 'Humidity (%)'),
+                                                   yaxis = list(title = 'Wind Speed (km/h)'),
+                                                   zaxis = list(title = 'Temperature (°C)')))
+fig_surface
