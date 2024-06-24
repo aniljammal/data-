@@ -1,0 +1,29 @@
+library(ggplot2)
+library(plotly)
+library(akima)
+
+environmental_data <- data.frame(
+  Location = c('A', 'B', 'C', 'D', 'E'),
+  Temperature = c(15, 20, 18, 12, 17),
+  Humidity = c(65, 70, 68, 60, 72),
+  CO2_Levels = c(400, 450, 420, 380, 430)
+)
+fig <- plot_ly(environmental_data, x = ~Temperature, y = ~Humidity, z = ~CO2_Levels, type = 'scatter3d', mode = 'markers')
+fig <- fig %>% layout(title = '3D Scatter Plot of Environmental Data',
+                      scene = list(xaxis = list(title = 'Temperature (°C)'),
+                                   yaxis = list(title = 'Humidity (%)'),
+                                   zaxis = list(title = 'CO2 Levels (ppm)')))
+fig
+akima_interp <- interp(x = environmental_data$Temperature, 
+                       y = environmental_data$Humidity, 
+                       z = environmental_data$CO2_Levels, 
+                       xo = seq(min(environmental_data$Temperature), max(environmental_data$Temperature), length = 30), 
+                       yo = seq(min(environmental_data$Humidity), max(environmental_data$Humidity), length = 30))
+
+co2_matrix <- akima_interp$z
+fig_surface <- plot_ly(z = ~co2_matrix, x = ~akima_interp$xo, y = ~akima_interp$yo, type = 'surface')
+fig_surface <- fig_surface %>% layout(title = '3D Surface Plot of CO2 Levels',
+                                      scene = list(xaxis = list(title = 'Temperature (°C)'),
+                                                   yaxis = list(title = 'Humidity (%)'),
+                                                   zaxis = list(title = 'CO2 Levels (ppm)')))
+fig_surface
