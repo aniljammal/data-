@@ -1,0 +1,27 @@
+market_data <- data.frame(
+  Date = as.Date(c('2023-01-01', '2023-01-02', '2023-01-03', '2023-01-04', '2023-01-05')),
+  Stock_Price = c(100, 102, 98, 105, 108),
+  Volume_Traded = c(2.5, 3.0, 2.2, 2.8, 3.5),
+  Market_Cap = c(500, 510, 490, 525, 540)
+)
+
+fig <- plot_ly(market_data, x = ~Volume_Traded, y = ~Market_Cap, z = ~Stock_Price, type = 'scatter3d', mode = 'markers')
+fig <- fig %>% layout(title = '3D Scatter Plot of Financial Market Data',
+                      scene = list(xaxis = list(title = 'Volume Traded (millions)'),
+                                   yaxis = list(title = 'Market Cap ($)'),
+                                   zaxis = list(title = 'Stock Price ($)')))
+fig
+
+market_cap_surface <- loess(Market_Cap ~ Stock_Price * Volume_Traded, data = market_data)
+stock_price_seq <- seq(min(market_data$Stock_Price), max(market_data$Stock_Price), length.out = 30)
+volume_traded_seq <- seq(min(market_data$Volume_Traded), max(market_data$Volume_Traded), length.out = 30)
+market_cap_grid <- expand.grid(Stock_Price = stock_price_seq, Volume_Traded = volume_traded_seq)
+market_cap_grid$Market_Cap <- predict(market_cap_surface, newdata = market_cap_grid)
+
+fig_surface <- plot_ly(z = ~matrix(market_cap_grid$Market_Cap, nrow = 30), 
+                       x = ~stock_price_seq, y = ~volume_traded_seq, type = 'surface')
+fig_surface <- fig_surface %>% layout(title = '3D Surface Plot of Market Cap',
+                                      scene = list(xaxis = list(title = 'Stock Price ($)'),
+                                                   yaxis = list(title = 'Volume Traded (millions)'),
+                                                   zaxis = list(title = 'Market Cap ($)')))
+fig_surface
