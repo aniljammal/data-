@@ -1,0 +1,47 @@
+
+library(ggplot2)
+library(ggmosaic)
+library(grid)
+
+
+data <- data.frame(
+  ID = c(1, 2, 3, 4, 5),
+  Gender = c("Male", "Female", "Male", "Female", "Male"),
+  Education = c("Graduate", "Undergrad", "High School", "Graduate", "Undergrad"),
+  Occupation = c("Engineer", "Teacher", "Doctor", "Lawyer", "Artist")
+)
+
+
+bar_plot_gender <- ggplot(data, aes(x = Gender)) +
+  geom_bar(fill = "skyblue") +
+  geom_text(stat='count', aes(label=..count..), vjust=-0.5) +
+  labs(x = "Gender", y = "Count", title = "Bar Plot: Count of Each Gender") +
+  theme_minimal()
+
+pie_plot_education <- function(data) {
+  pie_data <- table(data$Education)
+  pie_labels <- paste(names(pie_data), pie_data, sep = ": ")
+  pie(pie_data, labels = pie_labels, main = "Pie Chart: Distribution of Education Levels", col = rainbow(length(pie_data)))
+}
+
+stacked_bar_plot <- ggplot(data, aes(x = Occupation, fill = Gender)) +
+  geom_bar(position = "stack") +
+  geom_text(stat='count', aes(label=..count..), position = position_stack(vjust=0.5)) +
+  labs(x = "Occupation", y = "Count", title = "Stacked Bar Plot: Occupation by Gender") +
+  theme_minimal()
+
+mosaic_plot <- function(data) {
+  data_mosaic <- table(data$Education, data$Occupation)
+  mosaic(data_mosaic, shade = TRUE, main = "Mosaic Plot: Education vs Occupation")
+}
+
+grouped_bar_plot <- ggplot(data, aes(x = Education, fill = Gender)) +
+  geom_bar(position = "dodge") +
+  geom_text(stat='count', aes(label=..count..), position = position_dodge(width=0.9), vjust=-0.5) +
+  labs(x = "Education", y = "Count", title = "Grouped Bar Plot: Gender by Education") +
+  theme_minimal()
+print(bar_plot_gender)
+pie_plot_education(data)
+print(stacked_bar_plot)
+mosaic_plot(data)
+print(grouped_bar_plot)
