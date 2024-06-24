@@ -1,0 +1,51 @@
+library(ggplot2)
+
+data <- data.frame(
+  ID = c(1, 2, 3, 4, 5),
+  Age = c(25, 30, 28, 35, 40),
+  Height = c(175, 180, 170, 165, 185),
+  Weight = c(70, 80, 65, 75, 90)
+)
+
+scatter_plot <- ggplot(data, aes(x = Age, y = Weight)) +
+  geom_point(size = 3, color = "blue") +
+  geom_text(aes(label = Weight), vjust = -0.5, hjust = 0.5) +
+  labs(x = "Age", y = "Weight",
+       title = "Scatter Plot: Age vs Weight") +
+  theme_minimal()
+
+histogram_plot <- ggplot(data, aes(x = Height)) +
+  geom_histogram(binwidth = 5, fill = "skyblue", color = "black") +
+  geom_text(stat='count', aes(label=..count..), vjust=-1) +
+  labs(x = "Height", y = "Count",
+       title = "Histogram of Height") +
+  theme_minimal()
+
+
+line_chart <- ggplot(data, aes(x = ID, y = Weight)) +
+  geom_line(color = "blue") +
+  geom_point(size = 3, color = "blue") +
+  geom_text(aes(label = Weight), vjust = -0.5, hjust = 0.5) +
+  labs(x = "ID", y = "Weight",
+       title = "Line Chart: Weight over IDs") +
+  theme_minimal()
+
+box_plot <- ggplot(data, aes(y = Age)) +
+  geom_boxplot(fill = "skyblue") +
+  geom_text(aes(label = Age), stat = "boxplot", position = position_dodge(1), vjust = -0.5) +
+  labs(y = "Age",
+       title = "Box Plot of Age") +
+  theme_minimal()
+
+density_plot <- ggplot(data, aes(x = Height)) +
+  geom_density(fill = "skyblue", alpha = 0.5) +
+  geom_vline(aes(xintercept = mean(Height)), color = "red", linetype = "dashed") +
+  labs(x = "Height",
+       title = "Density Plot of Height") +
+  theme_minimal()
+
+print(scatter_plot)
+print(histogram_plot)
+print(line_chart)
+print(box_plot)
+print(density_plot)
